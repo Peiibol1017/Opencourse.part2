@@ -1,18 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import './App.css'
 import FilteredNames from './components/FilterNames'
 import AddNewName from './components/AddContacts'
 import FilterInput from './components/FilterInput'
 
 const App = () => {
-const [persons, newPersons] = useState ([
-  {name: 'Arto Hellas', id:'Arto Hellas', number:'346346346'},
-  {name: 'pedro piique', id:'pedro piique', number:'5329056096'},
-  {name: 'el amo de todo', id:'el amo de todo', number:'123123123'}
-])
+const [persons, newPersons] = useState ([])
 const [newName, setNewName] = useState ('')
 const [newNumber, setNewNumber] = useState('')
 const [filteredName, showFilteredName] = useState('')
+const hook = () => {
+axios
+.get('http://localhost:3001/persons')
+.then(response => {
+  newPersons(response.data)
+})
+}
+useEffect(hook,[])
 
 const addNameHandler = (event) =>{
   setNewName(event.target.value)
