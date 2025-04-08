@@ -1,3 +1,5 @@
+import noteService from '../Services/Services'
+
 const AddNewName = (props) =>{
     const persons = props.persons
     const newName = props.newName
@@ -5,17 +7,65 @@ const AddNewName = (props) =>{
     const addName = (event) =>{
         event.preventDefault()
         if (persons.find((personid) => personid.id == newName)){
-          window.alert (`${newName} is already added to phonebook` )
-        } 
+          if(window.confirm (`${newName} is already added to phonebook, you want to replace with the new number?`)){
+          const personItem={
+            name: newName,
+            id:newName,
+            number:newNumber,
+          }
+          noteService
+          .update(newName, personItem)
+          .then(response => {
+            props.newPersons (persons.map(person => person.id !== newName ? person : response.data))
+            props.setNewName ('')
+            props.setNewNumber('')
+            props.setErrorState(false)
+            props.setErrorMessage(`${newName} has been changed`)
+            setTimeout(()=>{
+              props.setErrorMessage(null)
+            }, 5000)
+          })
+          .catch(e =>{
+            props.setErrorState(true)
+            props.setErrorMessage(`${e}`)
+          setTimeout(()=>{
+            props.setErrorMessage(null)
+          }, 5000)
+          })
+        }
+        else {
+          props.setErrorState (true)
+          props.setErrorMessage(`No changes realized`)
+        setTimeout(()=>{
+          props.setErrorMessage(null)
+        }, 5000)}
+      }
         else {
         const personItem ={
           name: newName,
           id:newName,
           number:newNumber,
         } 
-        props.newPersons (persons.concat(personItem))
+        noteService
+        .create(personItem)
+        .then(response => {
+        props.newPersons (persons.concat(response.data))
         props.setNewName ('')
-        props.setNewNumber('')}
+        props.setNewNumber('')
+        props.setErrorState(false)
+        props.setErrorMessage(`${newName} has been added to phonebook`)
+        setTimeout(()=>{
+          props.setErrorMessage(null)
+        }, 5000)
+        })
+        .catch(()=>{
+          props.setErrorState(true)
+          props.setErrorMessage(`${newName} has already been deleted from server`)
+        setTimeout(()=>{
+          props.setErrorMessage(null)
+        }, 5000)
+        })
+      }
     }
 return (
     <form onSubmit={addName}>
