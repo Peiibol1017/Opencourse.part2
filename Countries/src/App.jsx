@@ -7,6 +7,10 @@ import TheOneCountry from './Components/OneCountryComponent'
 function App() {
   const [countries, setCountries] = useState([])
   const [filtered,setFiltered] = useState('')
+  const [weather, setWeather] = useState(null)
+  const [lat, setWeatherLat] = useState('')
+  const [lon, setWeatherLon] = useState('')
+  const [loaded, setLoaded] = useState(false)
 const loadPage = () => {
   countryService
   .getAll()
@@ -14,7 +18,6 @@ const loadPage = () => {
     setCountries(response.data)
 })
 }
-
 useEffect(loadPage,[])
 
 const filterHandler = (event) => {
@@ -22,6 +25,7 @@ const filterHandler = (event) => {
 }
 
 const justFilteredCountries = countries.filter(country => country.name.common.toLowerCase().indexOf(filtered.toLowerCase()) > -1,)
+console.log(justFilteredCountries.length)
 if (justFilteredCountries.length > 10 || justFilteredCountries.length === 0) {
   return (
     <div>
@@ -38,7 +42,7 @@ if (justFilteredCountries.length > 10 || justFilteredCountries.length === 0) {
       Type the country you looking for: <input value={filtered} onChange={filterHandler}/>
     </div>
    <ul>
-   {justFilteredCountries.map((country) => <TheList name={country.name.common} key={country.population}/>)}
+   {justFilteredCountries.map((country) => <TheList name={country.name.common} key={country.population} setFiltered={setFiltered}/>)}
    </ul>
   </div>
   )
@@ -49,7 +53,7 @@ if (justFilteredCountries.length > 10 || justFilteredCountries.length === 0) {
     <div>
       Type the country you looking for: <input value={filtered} onChange={filterHandler}/>
     </div> 
-   {justFilteredCountries.map((country) => <TheOneCountry key={country.population} name={country.name.common}/>)}
+  <TheOneCountry setLoaded={setLoaded} loaded={loaded} lat={lat} setWeatherLat={setWeatherLat} lon={lon} setWeatherLon={setWeatherLon} weather={weather} setWeather={setWeather} key={justFilteredCountries[0].population} name={justFilteredCountries[0].name.common} capital={justFilteredCountries[0].capital} area={justFilteredCountries[0].area} languages={justFilteredCountries[0].languages} flag={justFilteredCountries[0].flags}/>
   </div>
   )
 }
